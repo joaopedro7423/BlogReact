@@ -7,6 +7,7 @@ import "./global.css";
 import Home from "./components/Home/index";
 import Login from "./components/Login/index";
 import Header from "./components/Header";
+import Dashboard from "./components/Dashboard";
 
 class App extends Component {
   state = {
@@ -25,6 +26,7 @@ class App extends Component {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/login" component={Login} />
+          <Route exact path="/dashboard" component={Dashboard} />
         </Switch>
       </BrowserRouter>
     ) : (
