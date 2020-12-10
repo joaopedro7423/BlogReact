@@ -9,12 +9,15 @@ class New extends Component {
     super(props);
     this.state = {
       titulo: "",
-      imagem: "",
+      imagem: null,
+      url: "",
       descricao: "",
       alert: "",
     };
 
     this.cadastrar = this.cadastrar.bind(this);
+    this.handleFile = this.handleFile.bind(this);
+    this.handleUpload = this.handleUpload.bind(this);
   }
   componentDidMount() {
     if (!firebase.getCurrent()) {
@@ -47,6 +50,44 @@ class New extends Component {
     }
   };
 
+  handleFile = async (e) => {
+    if (e.target.files[0]) {
+      const image = e.target.files[0];
+
+      if (image.type === "image/png" || image.type === "image/jpeg") {
+        await this.setState({ imagem: image });
+        this.handleUpload();
+      } else {
+        alert("Envie uma imagem PNG ou JPG");
+        this.setState({ imagem: null });
+        return null;
+      }
+    }
+  };
+
+  handleUpload = async () => {
+    const {imagem} = this.state;
+    const currentUid = firebase.getCurrentUid();
+   
+    
+    const uploadTaks = firebase.storage
+    .ref(`imagens/${currentUid}/${imagem.name}`)
+    .put(imagem);
+
+    // await uploadTaks.on('state_changed',
+    // (snapshot)=>{
+    //   //progress
+    // },
+    // (error)=>{
+    //   //Erro
+    //   console.log('Error imagem '+ error);
+    // },
+    // ()=>{
+    //   //Sucesso
+    // }
+    // )
+  };
+
   render() {
     return (
       <div>
@@ -54,7 +95,8 @@ class New extends Component {
           <Link to="/dashboard">voltar</Link>
         </header>
         <form onSubmit={this.cadastrar} id="new-post">
-          <span>{ this.state.alert }</span>
+          <span>{this.state.alert}</span>
+          <input type="file" onChange={this.handleFile} /> <br />
           <label>Titulo:</label>
           <input
             type="text"
@@ -62,15 +104,6 @@ class New extends Component {
             value={this.state.titulo}
             autoFocus
             onChange={(e) => this.setState({ titulo: e.target.value })}
-          />{" "}
-          <br />
-          <label>Url da imagem:</label>
-          <input
-            type="text"
-            placeholder="Url da capa"
-            value={this.state.imagem}
-            autoFocus
-            onChange={(e) => this.setState({ imagem: e.target.value })}
           />{" "}
           <br />
           <label>Descrição:</label>
