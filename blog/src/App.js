@@ -1,32 +1,33 @@
-import { render } from '@testing-library/react';
-import React , {Component} from 'react';
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
-import firebase from './firebase';
+import { render } from "@testing-library/react";
+import React, { Component } from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import firebase from "./firebase";
 
-import './global.css';
-import Home from './components/Home/index';
-import Header from './components/Header';
+import "./global.css";
+import Home from "./components/Home/index";
+import Login from "./components/Login/index";
+import Header from "./components/Header";
 
-class App extends Component{
-  
-  state ={
-    firebaseInitialized: false
+class App extends Component {
+  state = {
+    firebaseInitialized: false,
   };
-  componentDidMount(){
-    firebase.isInitialized().then(resultado => {
-      this.setState({firebaseInitialized: resultado});
-    })
+  componentDidMount() {
+    firebase.isInitialized().then((resultado) => {
+      this.setState({ firebaseInitialized: resultado });
+    });
   }
 
-  render(){
+  render() {
     return this.state.firebaseInitialized !== false ? (
       <BrowserRouter>
-      <Header></Header>
+        <Header></Header>
         <Switch>
           <Route exact path="/" component={Home} />
+          <Route exact path="/login" component={Login} />
         </Switch>
       </BrowserRouter>
-    ):(
+    ) : (
       <h1>Carregando...</h1>
     );
   }
