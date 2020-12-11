@@ -13,6 +13,7 @@ class New extends Component {
       url: "",
       descricao: "",
       alert: "",
+      progress: 0,
     };
 
     this.cadastrar = this.cadastrar.bind(this);
@@ -33,13 +34,15 @@ class New extends Component {
     if (
       this.state.titulo !== "" &&
       this.state.imagem !== "" &&
-      this.state.descricao !== ""
+      this.state.descricao !== "" &&
+      this.state.imagem !== null &&
+      this.state.url !== ''
     ) {
       let posts = firebase.app.ref("posts");
       let chave = posts.push().key;
       await posts.child(chave).set({
         titulo: this.state.titulo,
-        image: this.state.imagem,
+        image: this.state.url,
         descricao: this.state.descricao,
         autor: localStorage.nome,
       });
@@ -71,21 +74,32 @@ class New extends Component {
    
     
     const uploadTaks = firebase.storage
-    .ref(`imagens/${currentUid}/${imagem.name}`)
+    .ref(`images/${currentUid}/${imagem.name}`)
     .put(imagem);
 
-    // await uploadTaks.on('state_changed',
-    // (snapshot)=>{
-    //   //progress
-    // },
-    // (error)=>{
-    //   //Erro
-    //   console.log('Error imagem '+ error);
-    // },
-    // ()=>{
-    //   //Sucesso
-    // }
-    // )
+    await uploadTaks.on('state_changed',
+    (snapshot)=>{
+      //progress
+      const progress = Math.round(
+        (snapshot.bytesTransferred 
+        / snapshot.totalBytes)*100);
+
+        this.setState({progress});
+    },
+    (error)=>{
+      //Erro
+      console.log('Error imagem '+ error);
+    },
+    ()=>{
+      //Sucesso
+      firebase.storage.ref(`images/${currentUid}`)
+      .child(imagem.name).getDownloadURL()
+      .then(url=>{
+        this.setState({url: url});
+
+      })
+    }
+    )
   };
 
   render() {
@@ -94,9 +108,16 @@ class New extends Component {
         <header id="new">
           <Link to="/dashboard">voltar</Link>
         </header>
-        <form onSubmit={this.cadastrar} id="new-post">
+        <form onSubmit={this.cadastrar} id="new-post">  
           <span>{this.state.alert}</span>
+
           <input type="file" onChange={this.handleFile} /> <br />
+          {this.state.url !== '' ?
+            <img src={this.state.url} width="250" height="150" alt="Capa do post" />
+            :
+            <progress value={this.state.progress} max="100" />
+          }
+        
           <label>Titulo:</label>
           <input
             type="text"

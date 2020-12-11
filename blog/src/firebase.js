@@ -52,7 +52,7 @@ class Firebase {
   }
 
   getCurrentUid(){
-    return app.auth().currentUser && app.auth().currentUser.uid
+    return app.auth().currentUser && app.auth().currentUser.uid; 
   }
 
   async getUserName(callback){
